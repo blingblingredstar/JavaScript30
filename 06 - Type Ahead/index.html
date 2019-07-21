@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Type Ahead 👀</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <form class="search-form">
+    <input type="text" class="search" placeholder="City or State">
+    <ul class="suggestions">
+      <li>Filter for a city</li>
+      <li>or a state</li>
+    </ul>
+  </form>
+  <script>
+    /*
+    任务目标:模拟搜索引擎，从api获取数据，输入城市名或州名，动态展示匹配结果列表，高亮匹配部分，格式化匹配结果中人口部分
+    实现步骤: 1.使用fetch方法，获取到传来的数据，将其格式化为数组
+            2.
+    
+    */
+
+    // 获取数据，存储到数组中。
+    const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+    const cities = []
+    const promise = fetch(endpoint)
+      .then(res => res.json())
+      .then(data => cities.push(...data))
+    // 匹配输入的数据
+    function matchcities(cityName, cities) {
+      return cities.filter(city => {
+        //  新建正则表达式，匹配输入的内容，不区分大小写
+        const regx = new RegExp(cityName, 'gi')
+        // 使用match方法传入正则表达式匹配数据
+        return city.city.match(regx) || city.state.match(regx)
+      })
+    }
+    // 格式化人口数字
+    function numberWithCommas(num) {
+      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    // 展示匹配好的数据
+    function displayMatchs() {
+      //  获取匹配好的数组
+      const matchArray = matchcities(this.value, cities)
+      // 重新渲染suggestions中的内容，展示匹配数据
+      const html = matchArray.map(item => {
+        // 高亮输入内容
+        const regx = new RegExp(this.value, 'gi')
+        const highLightCity = item.city.replace(regx, `<span class="hl">${this.value}</span>`)
+        const highLightState = item.state.replace(regx, `<span class="hl">${this.value}</span>`)
+        // 格式化人口数字
+        const formatPopulation = numberWithCommas(item.population)
+        // 返回需要渲染的内容
+        return `
+        <li>
+          <span class="name">${highLightCity}, ${highLightState}</span>
+          <span class="population">${formatPopulation}</span>
+        </li>
+        `
+      }).join('')
+      // 将内容渲染到页面上
+      suggestions.innerHTML = html
+    }
+
+    // 获取输入标签及展示标签
+    const input = document.querySelector('.search')
+    const suggestions = document.querySelector('.suggestions')
+    // 注册change时间及keyup事件监听用户输入
+    input.addEventListener('change', displayMatchs)
+    input.addEventListener('keyup', displayMatchs)
+  </script>
+</body>
+
+</html>

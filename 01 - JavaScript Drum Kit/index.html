@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>JS Drum Kit</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+
+  <div class="keys">
+    <div data-key="65" class="key">
+      <kbd>A</kbd>
+      <span class="sound">clap</span>
+    </div>
+    <div data-key="83" class="key">
+      <kbd>S</kbd>
+      <span class="sound">hihat</span>
+    </div>
+    <div data-key="68" class="key">
+      <kbd>D</kbd>
+      <span class="sound">kick</span>
+    </div>
+    <div data-key="70" class="key">
+      <kbd>F</kbd>
+      <span class="sound">openhat</span>
+    </div>
+    <div data-key="71" class="key">
+      <kbd>G</kbd>
+      <span class="sound">boom</span>
+    </div>
+    <div data-key="72" class="key">
+      <kbd>H</kbd>
+      <span class="sound">ride</span>
+    </div>
+    <div data-key="74" class="key">
+      <kbd>J</kbd>
+      <span class="sound">snare</span>
+    </div>
+    <div data-key="75" class="key">
+      <kbd>K</kbd>
+      <span class="sound">tom</span>
+    </div>
+    <div data-key="76" class="key">
+      <kbd>L</kbd>
+      <span class="sound">tink</span>
+    </div>
+  </div>
+
+  <audio data-key="65" src="sounds/clap.wav"></audio>
+  <audio data-key="83" src="sounds/hihat.wav"></audio>
+  <audio data-key="68" src="sounds/kick.wav"></audio>
+  <audio data-key="70" src="sounds/openhat.wav"></audio>
+  <audio data-key="71" src="sounds/boom.wav"></audio>
+  <audio data-key="72" src="sounds/ride.wav"></audio>
+  <audio data-key="74" src="sounds/snare.wav"></audio>
+  <audio data-key="75" src="sounds/tom.wav"></audio>
+  <audio data-key="76" src="sounds/tink.wav"></audio>
+
+  <script>
+    /*
+    *要实现的效果：按下键盘对应键，播放动画和音乐。
+    *实现步骤：
+    *1.注册键盘按下事件，通过自定义标签[data-key=键值]，获取到对应的div及audio标签
+    *2.执行playSound函数，播放音乐并给div添加动画
+    *3.注册div动画结束事件，执行removeTransition函数，移除动画样式
+    */
+
+    // 2.播放音乐并添加动画
+    function playSound(e) {
+      const audio = document.querySelector(`audio[data-key="${e.keyCode}"]`);// 根据键盘按下的键值获取对应的audio标签对象
+
+      const key = document.querySelector(`div[data-key="${e.keyCode}"]`);  // 根据键盘按下的键值获取对应的div标签
+
+      if (!audio) return; // 如果audio对象不存在，直接返回
+    
+      audio.currentTime = 0;  // 播放前初始化音频播放时间为0
+     
+      audio.play(); // 播放音频
+
+      key.classList.add('playing'); // 为key对象添加playing样式
+    }
+
+    // 4.移除动画
+    function removeTransition(e) {
+      if (e.propertyName !== "transform") return;// 此时获取的transitionEnd事件有多个，选择只留下“transform”事件
+     
+      e.target.classList.remove('playing') // 留下的transform变换结束事件的target为当前的key对象，移除playing样式
+    }
+
+    // 3.获取添加了动画的标签
+   
+    const keys = Array.from(document.querySelectorAll('.key')); // 获取所有.key样式的div标签
+   
+    keys.forEach(key => key.addEventListener('transitionend', removeTransition)) // 为keys中每一个标签注册监听事件，动画播放完毕后，执行removeTransition函数
+    
+    window.addEventListener('keydown', playSound); // 1.注册监听键盘按下事件，执行playSound
+  </script>
+
+
+</body>
+
+</html>

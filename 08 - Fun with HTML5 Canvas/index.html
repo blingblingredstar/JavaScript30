@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>HTML5 Canvas</title>
+</head>
+
+<body>
+  <canvas id="draw" width="800" height="800"></canvas>
+  <script>
+    /*
+    任务目标：通过canvas来创建一个html的画图板。
+    实现步骤：
+    */
+
+    // canvas起初是空白的。为了展示，首先脚本需要找到渲染上下文，然后在它的上面绘制。
+    // <canvas> 元素有一个叫做 getContext() 的方法，这个方法是用来获得渲染上下文和它的绘画功能。
+    // getContext()只有一个参数，上下文的格式。
+    const canvas = document.getElementById('draw'),
+      ctx = canvas.getContext('2d')
+
+    // 使canvas元素宽高与浏览器窗口大小相等。
+    ;[canvas.width, canvas.height] = [window.innerWidth, window.innerHeight]
+
+    ctx.strokeStyle = '#bada55'//图形边线的颜色和样式。 默认 #000 (黑色).
+    ctx.lineCap = 'round'//线末端的类型。 允许的值： butt (默认), round, square.
+    ctx.lineJoin = 'round'//定义两线相交拐点的类型。允许的值：round, bevel, miter(默认)。
+    ctx.lineWidth = 50//线的宽度。默认 1.0
+
+    let isDrawing = false,//记录是否开始绘制
+      lastX = 0,//记录每次绘制起点x坐标
+      lastY = 0,//记录每次绘制起点y坐标
+      hue = 0,//每次绘制起始颜色
+      direction = true//判断线宽增减状态
+
+    function draw(e) {
+      // 如果当前没有开始绘制，直接返回
+      if (!isDrawing) return
+      // 开始绘制
+      ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`//设置颜色
+      ctx.beginPath()//清空子路径列表开始一个新的路径。当你想创建一个新的路径时，调用此方法。
+      ctx.moveTo(lastX, lastY)//将一个新的子路径的起始点移动到(x，y)坐标。
+      ctx.lineTo(e.offsetX, e.offsetY)//使用直线连接子路径的最后的点到x,y坐标。
+      ctx.stroke()//使用当前的样式描边子路径。
+      ;[lastX, lastY] = [e.offsetX, e.offsetY]
+      // 绘制结束
+      hue++//改变颜色
+      //限定颜色改变范围
+      if (hue >= 360){
+        hue = 0
+      }
+
+      // 限定线宽，并周期性改变
+      if(ctx.lineWidth >= 50 || ctx.lineWidth <= 1){
+        direction = !direction
+      }
+      if(direction){
+        ctx.lineWidth++
+      }else{
+        ctx.lineWidth--
+      }
+      
+    }
+
+    // 因为希望只有鼠标摁下才开始绘制，所以按下鼠标时更改isDrawing标识为真，
+    // 同时给鼠标移动注册事件，调用draw
+    // 当鼠标抬起或离开绘制区域更改isDrawing标识
+    canvas.addEventListener('mousedown', (e) => {
+      isDrawing = true
+      lastX = e.offsetX
+      lastY = e.offsetY
+    })
+    canvas.addEventListener('mousemove', draw)
+    canvas.addEventListener('mouseup', () => isDrawing = false)
+    canvas.addEventListener('mouseout', () => isDrawing = false)
+
+  </script>
+
+  <style>
+    html,
+    body {
+      margin: 0;
+    }
+  </style>
+
+</body>
+
+</html>

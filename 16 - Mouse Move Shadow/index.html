@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Mouse Shadow</title>
+</head>
+
+<body>
+
+  <div class="hero">
+    <h1 contenteditable>🔥WOAH!</h1>
+  </div>
+
+  <style>
+    html {
+      color: black;
+      font-family: sans-serif;
+    }
+
+    body {
+      margin: 0;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: black;
+    }
+
+    h1 {
+      text-shadow: 10px 10px 0 rgba(0, 0, 0, 1);
+      font-size: 100px;
+    }
+  </style>
+
+  <script>
+    /*
+      任务目标：移动鼠标，使文字阴影动态变化
+    */
+    const title = document.querySelector('.hero')
+    const text = document.querySelector('.hero>h1')
+
+    function shadow(e) {
+      const { offsetWidth: width, offsetHeight: height } = title // 声明变量width，height存储元素宽，高
+      let { x: x, y: y } = e // 声明变量x，y存储当前鼠标的横纵坐标
+      const walk = 100 // 声明变量，存储阴影移动范围
+
+      // 此时因为监听的是父级元素，所以如果鼠标移动到子元素x,y值可能会归零
+      if (this !== e.target) { // 如果鼠标移动到子元素上，就在x，y上加上元素宽高，使当前x，y与预期一致
+        x += e.target.offsetWidth 
+        y += e.target.offsetHeight
+      }
+
+      const xWalk = Math.round((x / width * walk) - (walk / 2)) // 声明变量，保存阴影横向移动距离
+      const yWalk = Math.round((y / height * walk) - (walk / 2)) // 声明变量，保存阴影纵向移动距离
+
+      text.style.textShadow = `
+      ${xWalk}px ${yWalk}px 0 rgba(255,0,255,0.7),
+      ${xWalk * -1}px ${yWalk}px 0 rgba(0,255,255,0.7),
+      ${yWalk}px ${xWalk * -1}px 0 rgba(0,255,0,0.7),
+      ${yWalk * -1}px ${xWalk}px 0 rgba(0,0,255,0.7)
+      `
+    }
+
+    title.addEventListener('mousemove', shadow)
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Speech Synthesis</title>
+  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="voiceinator">
+
+    <h1>The Voiceinator 5000</h1>
+
+    <select name="voice" id="voices">
+      <option value="">Select A Voice</option>
+    </select>
+
+    <label for="rate">Rate:</label>
+    <input name="rate" type="range" min="0" max="3" value="1" step="0.1">
+
+    <label for="pitch">Pitch:</label>
+
+    <input name="pitch" type="range" min="0" max="2" step="0.1">
+    <textarea name="text">Hello! I love JavaScript 👍</textarea>
+    <button id="stop">Stop!</button>
+    <button id="speak">Speak</button>
+
+  </div>
+
+  <script>
+    const msg = new SpeechSynthesisUtterance();
+    let voices = [];
+    const voicesDropdown = document.querySelector('[name="voice"]');
+    const options = document.querySelectorAll('[type="range"], [name="text"]');
+    const speakButton = document.querySelector('#speak');
+    const stopButton = document.querySelector('#stop');
+    msg.text = document.querySelector('[name="text"]').value
+
+    function populatesVoices() { // 选择声音
+      voices = this.getVoices()  // 获得所有可用的声音
+      voicesDropdown.innerHTML = voices // 渲染声音选项到页面
+        .filter(voice => voice.lang.includes('zh')) // 筛选出中文
+        .map(voice => `<option value="${voice.name}">${voice.name} ${voice.lang}</option>`)
+        .join('')
+    }
+
+    function setVoice() { // 更改声音
+      this.voice = voices.find(voice => voice.name === this.value)
+      toggle()
+    }
+
+    function setOptions() { // 更改设置
+      msg[this.name] = this.value 
+      toggle()
+    }
+
+    function toggle(stratOver = true) { // 播放声音
+      speechSynthesis.cancel()
+      if(stratOver) {
+        speechSynthesis.speak(msg)
+      }
+    }
+
+    speechSynthesis.addEventListener('voiceschanged', populatesVoices) // 渲染可用声音
+    voicesDropdown.addEventListener('change', setVoice) // 选择声音
+    options.forEach(option => option.addEventListener('change', setOptions)) // 更改设置
+    speakButton.addEventListener('click', toggle) // 点击播放按钮播放
+    stopButton.addEventListener('click', () => toggle(false)) // 停止播放
+
+  </script>
+
+</body>
+
+</html>

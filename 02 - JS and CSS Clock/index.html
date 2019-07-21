@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>JS + CSS Clock</title>
+</head>
+
+<body>
+
+
+  <div class="clock">
+    <div class="clock-face">
+      <div class="hand hour-hand"></div>
+      <div class="hand min-hand"></div>
+      <div class="hand second-hand"></div>
+    </div>
+  </div>
+
+
+  <style>
+    html {
+      background: #018DED url(http://unsplash.it/1500/1000?image=881&blur=50);
+      background-size: cover;
+      font-family: 'helvetica neue';
+      text-align: center;
+      font-size: 10px;
+    }
+
+    body {
+      margin: 0;
+      font-size: 2rem;
+      display: flex;
+      flex: 1;
+      min-height: 100vh;
+      align-items: center;
+    }
+
+    .clock {
+      width: 30rem;
+      height: 30rem;
+      border: 20px solid white;
+      border-radius: 50%;
+      margin: 50px auto;
+      position: relative;
+      padding: 2rem;
+      box-shadow:
+        0 0 0 4px rgba(0, 0, 0, 0.1),
+        inset 0 0 0 3px #EFEFEF,
+        inset 0 0 10px black,
+        0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .clock-face {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform: translateY(-3px);
+      /* account for the height of the clock hands */
+    }
+
+    .hand {
+      width: 50%;
+      height: 6px;
+      background: black;
+      position: absolute;
+      top: 50%;
+      transform: rotate(90deg);
+      transform-origin: 100%;
+      transition: all .05s;
+      transition-timing-function: cubic-bezier(0.55, -0.43, 0.31, 1.32);
+    }
+  </style>
+
+  <script>
+    /* 
+    目标效果：控制时钟的三个指针，模拟时钟指针转动效果
+    实现步骤：1.通过css样式，给时钟指针添加旋转效果
+    （添加transform-origin，设置为100%，使其沿元素最右端旋转（默认50%，即沿中心旋转）
+    控制transform中rotate属性，初始值设置为90deg，是时钟指针指向12点位置，并添加过度动画）
+            2.设置setInterval，周期为1000毫秒，定时执行setDate函数。
+            3.通过setDate获取当前时间的时分秒，计算对应角度，获取对应元素，给其赋予transform
+    */
+
+    //获取页面上时钟的秒针 
+    const secondHand = document.querySelector('.second-hand');
+    //获取页面上时钟的分针
+    const minHand = document.querySelector('.min-hand');
+    //获取页面上时钟的时针
+    const hourHand = document.querySelector('.hour-hand');
+
+    function setDate() {
+      //新建一个时间对象，获取当前时间
+      const now = new Date();
+
+      //新建变量，存储当前时间的秒数
+      const sec = now.getSeconds();
+      //新建变量，存储当前秒数对应角度
+      const secDeg = ((sec / 60) * 360) + 90;
+      //修改秒针transform属性，使其旋转到对应角度
+      secondHand.style.transform = `rotate(${secDeg}deg)`;
+
+      //新建变量，存储当前时间的分钟数
+      const min = now.getMinutes();
+      //新建变量，存储当前分钟数对应角度
+      const minDeg = ((min / 60) * 360) + ((sec / 60) * 6) + 90;
+      //修改分针transform属性，使其旋转到对应角度
+      minHand.style.transform = `rotate(${minDeg}deg)`;
+
+      //新建变量，存储当前时间的小时数
+      const hour = now.getHours();
+      //新建变量，存储当前小时数对应角度
+      const hourDeg = ((hour / 12) * 360) + ((min / 60) * 30) + 90;
+      //修改时针transform属性，使其旋转到对应角度
+      hourHand.style.transform = `rotate(${hourDeg}deg)`;
+
+
+      // 此时观察到当时钟指针处于12点方向既450deg时，下一秒会变为90deg，所以动画会有抖动
+      // 新建判断，当指针等于90deg时，先清除过渡动画，在重新添加过渡动画。
+      if (secDeg === 90) {
+        secondHand.style.transition = 'all 0s';
+      }else{
+        secondHand.style.transition = 'all .05s';
+      }
+    };
+    // 加载时执行setDate函数，否则进入瞬间动画会抖动
+    setDate();
+
+    setInterval(setDate, 1000);
+  </script>
+</body>
+
+</html>

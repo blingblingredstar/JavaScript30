@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Scoped CSS Variables and JS</title>
+</head>
+
+<body>
+  <h2>Update CSS Variables with <span class='hl'>JS</span></h2>
+
+  <div class="controls">
+    <label for="spacing">Spacing:</label>
+    <input id="spacing" type="range" name="spacing" min="10" max="200" value="10" data-sizing="px">
+
+    <label for="blur">Blur:</label>
+    <input id="blur" type="range" name="blur" min="0" max="25" value="10" data-sizing="px">
+
+    <label for="base">Base Color</label>
+    <input id="base" type="color" name="base" value="#ffc600">
+  </div>
+
+  <img src="https://source.unsplash.com/7bwQXzbF6KE/800x500">
+
+  <style>
+    /* 1.给全局定义三个css变量 格式--变量名: 值*/
+    :root {
+      --base: #eb8e06;
+      --spacing: 10px;
+      --blur: 10px;
+    }
+
+    /* 2.在img标签上使用定义好的变量，使用方法var(--变量名) */
+    img {
+      background: var(--base);
+      padding: var(--spacing);
+      filter: blur(var(--blur));
+    }
+    .hl{
+      color: var(--base);
+    }
+    /*
+      misc styles, nothing to do with CSS variables
+    */
+
+    body {
+      text-align: center;
+      background: #193549;
+      color: white;
+      font-family: 'helvetica neue', sans-serif;
+      font-weight: 100;
+      font-size: 50px;
+    }
+
+    .controls {
+      margin-bottom: 50px;
+    }
+
+    input {
+      width: 100px;
+    }
+  </style>
+
+  <script>
+    /*
+    目标效果:通过页面上的input标签，控制img标签的padding值，
+            background-color，以及filter样式中blur属性值，动态更改样式
+    实现步骤:1.给全局定义三个css变量 格式--变量名: 值
+            2.在img标签上使用定义好的变量，使用方法var(--变量名)
+            3.获取页面上所有的input标签，此时获取的是一个NodeList。
+            4.为每个input标签分别注册改变事件及鼠标移动事件，调用handleUpdate函数
+            5.通过handleUpdate函数控制第一步注册的css变量
+    */
+
+  
+    const inputs = document.querySelectorAll('.controls input');  // 3.获取页面上所有的input标签，此时获取的是一个NodeList。
+
+    // 5.通过handleUpdate函数控制第一步注册的css变量
+    function handleUpdate() {
+      const sizing = this.dataset.sizing || ''; // 获取绑定在input标签上的data-sizing值
+      // 获取到document下的documentElement，通过setProperty设置其style属性
+      // 通过input标签的name属性、value属性及刚才获取的sizing值更改第一步定义的css变量。
+      document.documentElement.style.setProperty(`--${this.name}`,this.value+sizing)
+    }
+
+    // 4.为每个input标签分别注册改变事件及鼠标移动事件，调用handleUpdate函数
+    inputs.forEach(input => input.addEventListener('change',handleUpdate));
+    inputs.forEach(input => input.addEventListener('mousemove',handleUpdate));
+
+  </script>
+
+</body>
+
+</html>

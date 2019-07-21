@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Key Detection</title>
+  <script type="text/javascript" src="http://www.cornify.com/js/cornify.js"></script>
+</head>
+
+<body>
+  <script>
+    /*
+      任务目标：判断用户是否输入特定字符串(liuyong)，做出反应
+      任务步骤：
+  
+    */
+    const secretCode = 'liuyong', // 保存目标字符串
+      input = [] // 保存用户输入的字符串
+    window.addEventListener('keyup', (e) => {
+      input.push(e.key) // 将此次输入添加到数组最后
+      input.splice(-secretCode.length-1, input.length-secretCode.length) // 数组只保留目标字符串长度
+      if(input.join('').includes(secretCode)){ // 将数组转化为字符串并看是否包含目标字符串
+        cornify_add() // 执行操作
+      }
+    })
+  </script>
+</body>
+
+</html>
